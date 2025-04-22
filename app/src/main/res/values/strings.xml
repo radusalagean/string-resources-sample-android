@@ -1,3 +1,17 @@
 <resources>
-    <string name="app_name">String Resources Sample</string>
+    <string name="app_name" translatable="false">String Resources Sample</string>
+    
+    <string name="section_title_language">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_romanian">Romanian</string>
+
+    <string name="section_title_examples">Examples</string>
+    <string name="greeting">Hi, %1$s!</string>
+    <string name="shopping_cart_status">You have %1$s in your %2$s.</string>
+    <string name="shopping_cart_status_insert_shopping_cart">shopping cart</string>
+
+    <plurals name="products">
+        <item quantity="one">%1$s product</item>
+        <item quantity="other">%1$s products</item>
+    </plurals>
 </resources>

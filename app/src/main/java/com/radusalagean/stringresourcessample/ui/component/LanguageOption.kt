@@ -1,0 +1,8 @@
+package com.radusalagean.stringresourcessample.ui.component
+
+import com.radusalagean.stringresourcessample.util.string.UIText
+
+data class LanguageOption(
+    val uiText: UIText,
+    val languageCode: String
+)

@@ -14,7 +14,13 @@ sealed class UIText {
 
     protected abstract fun build(context: Context): CharSequence
 
-    fun buildString(context: Context) = build(context) as String
+    fun buildString(context: Context): String {
+        return when (val charSequence = build(context)) {
+            is String -> charSequence
+            is AnnotatedString -> charSequence.toString() // We drop any style here
+            else -> ""
+        }
+    }
 
     fun buildAnnotatedString(context: Context): AnnotatedString {
         return when (val charSequence = build(context)) {
@@ -31,7 +37,7 @@ sealed class UIText {
         }
     }
 
-    protected fun resolveArg(context: Context, arg: Any?) = when (arg) {
+    private fun resolveArg(context: Context, arg: Any?) = when (arg) {
         is UIText -> arg.build(context)
         else -> arg
     }
@@ -43,12 +49,31 @@ sealed class UIText {
         }
     }
 
+
+    /**
+     * In order to work around the default behavior of Android's getString(...) which will
+     *  drop any associated style, we generate placeholders in the form of ${0}, ${1}, etc
+     *  which will allow us to apply our custom logic to inject the arguments without losing
+     *  associated styles, in the correct order.
+     *
+     * Warning: We use ${digit} placeholders, so make sure you don't have such patterns hardcoded in
+     *  your string resources. Also, make sure you exclusively use "%s" (no order needed) or
+     *  "%1$s", "%2$s", etc. (specified order) in string files for arguments.
+     *
+     * Other formats in string resources "%.2f", "%d", etc. are not supported, but you can safely
+     *  replace them with string format arguments (e.g. %s) and offload formatting of other types
+     *  to your kotlin code.
+     */
+    private fun generatePlaceholderArgs(placeholdersCount: Int) =
+        List(placeholdersCount) { "\${$it}" }.toTypedArray()
+
+
     protected fun Resources.getStringWithPlaceholders(
         @StringRes resId: Int,
         placeholdersCount: Int
     ): String = getString(
         resId,
-        *List(placeholdersCount) { "\${$it}" }.toTypedArray()
+        *generatePlaceholderArgs(placeholdersCount)
     )
 
     protected fun Resources.getQuantityStringWithPlaceholders(
@@ -58,7 +83,7 @@ sealed class UIText {
     ): String = getQuantityString(
         resId,
         quantity,
-        *List(placeholdersCount) { "\${$it}" }.toTypedArray()
+        *generatePlaceholderArgs(placeholdersCount)
     )
 
     protected fun buildAnnotatedString(
@@ -113,7 +138,7 @@ sealed class UIText {
 
     class Res(
         @StringRes val resId: Int,
-        val args: List<Any?>
+        val args: List<Any?> = emptyList()
     ) : UIText() {
 
         constructor(

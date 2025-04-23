@@ -13,6 +13,7 @@ import com.radusalagean.stringresourcessample.ui.component.ExampleEntryModel
 import com.radusalagean.stringresourcessample.ui.component.LanguageOption
 import com.radusalagean.stringresourcessample.ui.theme.CustomGreen
 import com.radusalagean.stringresourcessample.util.string.UIText
+import com.radusalagean.stringresourcessample.util.string.uiTextBuilder
 
 class MainViewModel : ViewModel() {
 
@@ -100,6 +101,34 @@ class MainViewModel : ViewModel() {
                     ) to SpanStyle(color = Color.Red)
                 )
             )
+        ),
+        ExampleEntryModel(
+            label = UIText.Raw("DSL Builder"),
+            value = uiTextBuilder {
+                res(R.string.greeting) {
+                    arg("Radu")
+                }
+                raw(" ")
+                resSpanStyle(R.string.shopping_cart_status) {
+                    arg(
+                        uiTextBuilder {
+                            pluralResSpanStyle(
+                                R.plurals.products,
+                                quantity = 30,
+                                baseStyle = SpanStyle(fontWeight = FontWeight.Bold)
+                            ) {
+                                arg(30.toString(), SpanStyle(color = CustomGreen))
+                            }
+                        }
+                    )
+                    arg(
+                        uiTextBuilder {
+                            res(R.string.shopping_cart_status_insert_shopping_cart)
+                        },
+                        SpanStyle(color = Color.Red)
+                    )
+                }
+            }
         )
     )
 }

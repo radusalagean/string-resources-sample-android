@@ -2,7 +2,6 @@ package com.radusalagean.stringresourcessample.util.string
 
 import android.content.Context
 import android.content.res.Resources
-import android.text.Spanned
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.text.AnnotatedString
@@ -87,6 +86,17 @@ sealed class UIText {
     )
 
     protected fun buildAnnotatedString(
+        resolvedArgs: List<Any?>,
+        baseStringProvider: () -> String
+    ): CharSequence {
+        return buildAnnotatedString(
+            resolvedArgs = resolvedArgs.map { it to null },
+            baseSpanStyle = null,
+            baseStringProvider = baseStringProvider
+        )
+    }
+
+    protected fun buildAnnotatedString(
         context: Context,
         args: List<Pair<Any?, SpanStyle?>>,
         baseSpanStyle: SpanStyle?,
@@ -95,6 +105,18 @@ sealed class UIText {
         val resolvedArgs = args.map {
             resolveArg(context, it.first) to it.second
         }
+        return buildAnnotatedString(
+            resolvedArgs = resolvedArgs,
+            baseSpanStyle = baseSpanStyle,
+            baseStringProvider = baseStringProvider
+        )
+    }
+
+    private fun buildAnnotatedString(
+        resolvedArgs: List<Pair<Any?, SpanStyle?>>,
+        baseSpanStyle: SpanStyle?,
+        baseStringProvider: () -> String
+    ): CharSequence {
         return buildAnnotatedString {
             val baseString = baseStringProvider()
             val parts = baseString.split(placeholderRegex)
@@ -149,7 +171,19 @@ sealed class UIText {
         override fun build(context: Context): CharSequence {
             val resolvedArgs = resolveArgs(context, args)
             return resolvedArgs?.takeIf { it.isNotEmpty() }?.let {
-                context.getString(resId, *resolvedArgs.toTypedArray())
+                if (it.any { it is AnnotatedString}) {
+                    buildAnnotatedString(
+                        resolvedArgs = resolvedArgs,
+                        baseStringProvider = {
+                            context.resources.getStringWithPlaceholders(
+                                resId = resId,
+                                placeholdersCount = args.size
+                            )
+                        }
+                    )
+                } else {
+                    context.getString(resId, *resolvedArgs.toTypedArray())
+                }
             } ?: context.getString(resId)
         }
     }
@@ -168,7 +202,20 @@ sealed class UIText {
 
         override fun build(context: Context): CharSequence {
             val resolvedArgs = resolveArgs(context, args) ?: emptyList()
-            return context.resources.getQuantityString(resId, quantity, *resolvedArgs.toTypedArray())
+            return if (resolvedArgs.any { it is AnnotatedString }) {
+                buildAnnotatedString(
+                    resolvedArgs = resolvedArgs,
+                    baseStringProvider = {
+                        context.resources.getQuantityStringWithPlaceholders(
+                            resId = resId,
+                            quantity = quantity,
+                            placeholdersCount = args.size
+                        )
+                    }
+                )
+            } else {
+                context.resources.getQuantityString(resId, quantity, *resolvedArgs.toTypedArray())
+            }
         }
     }
 
@@ -242,7 +289,7 @@ sealed class UIText {
             if (parts.size == 1)
                 return parts[0]
 
-            val styled = parts.any { it is Spanned || it is AnnotatedString }
+            val styled = parts.any { it is AnnotatedString }
             return if (styled) {
                 buildAnnotatedString {
                     parts.forEach {

@@ -13,6 +13,7 @@ import com.radusalagean.stringresourcessample.ui.component.ExampleEntryModel
 import com.radusalagean.stringresourcessample.ui.component.LanguageOption
 import com.radusalagean.stringresourcessample.ui.theme.CustomGreen
 import com.radusalagean.stringresourcessample.util.string.UIText
+import com.radusalagean.stringresourcessample.util.string.asUITextAnnotation
 import com.radusalagean.stringresourcessample.util.string.uiTextBuilder
 
 class MainViewModel : ViewModel() {
@@ -54,8 +55,8 @@ class MainViewModel : ViewModel() {
             value = UIText.PluralRes(R.plurals.products, 30)
         ),
         ExampleEntryModel(
-            label = UIText.Raw("UIText.ResSpanStyle"),
-            value = UIText.ResSpanStyle(
+            label = UIText.Raw("UIText.ResAnnotated"),
+            value = UIText.ResAnnotated(
                 R.string.shopping_cart_status,
                 UIText.PluralRes(
                     R.plurals.products,
@@ -63,20 +64,20 @@ class MainViewModel : ViewModel() {
                 ) to null,
                 UIText.Res(
                     R.string.shopping_cart_status_insert_shopping_cart
-                ) to SpanStyle(color = Color.Red)
+                ) to SpanStyle(color = Color.Red).asUITextAnnotation()
             )
         ),
         ExampleEntryModel(
-            label = UIText.Raw("UIText.PluralResSpanStyle"),
-            value = UIText.PluralResSpanStyle(
+            label = UIText.Raw("UIText.PluralResAnnotated"),
+            value = UIText.PluralResAnnotated(
                 R.plurals.products,
                 quantity = 30,
                 30 to SpanStyle(
                     color = CustomGreen
-                ),
-                baseSpanStyle = SpanStyle(
+                ).asUITextAnnotation(),
+                baseAnnotation = SpanStyle(
                     fontWeight = FontWeight.Bold
-                )
+                ).asUITextAnnotation()
             )
         ),
         ExampleEntryModel(
@@ -84,21 +85,21 @@ class MainViewModel : ViewModel() {
             value = UIText.Compound(
                 UIText.Res(R.string.greeting, "Radu"),
                 UIText.Raw(" "),
-                UIText.ResSpanStyle(
+                UIText.ResAnnotated(
                     R.string.shopping_cart_status,
-                    UIText.PluralResSpanStyle(
+                    UIText.PluralResAnnotated(
                         R.plurals.products,
                         quantity = 30,
                         30 to SpanStyle(
                             color = CustomGreen
-                        ),
-                        baseSpanStyle = SpanStyle(
+                        ).asUITextAnnotation(),
+                        baseAnnotation = SpanStyle(
                             fontWeight = FontWeight.Bold,
-                        )
+                        ).asUITextAnnotation()
                     ) to null,
                     UIText.Res(
                         R.string.shopping_cart_status_insert_shopping_cart
-                    ) to SpanStyle(color = Color.Red)
+                    ) to SpanStyle(color = Color.Red).asUITextAnnotation()
                 )
             )
         ),
@@ -109,15 +110,19 @@ class MainViewModel : ViewModel() {
                     arg("Radu")
                 }
                 raw(" ")
-                resSpanStyle(R.string.shopping_cart_status) {
+                resAnnotated(R.string.shopping_cart_status) {
                     arg(
                         uiTextBuilder {
-                            pluralResSpanStyle(
+                            pluralResAnnotated(
                                 R.plurals.products,
                                 quantity = 30,
-                                baseStyle = SpanStyle(fontWeight = FontWeight.Bold)
+                                baseAnnotation = SpanStyle(fontWeight = FontWeight.Bold)
+                                    .asUITextAnnotation()
                             ) {
-                                arg(30.toString(), SpanStyle(color = CustomGreen))
+                                arg(
+                                    30.toString(),
+                                    SpanStyle(color = CustomGreen).asUITextAnnotation()
+                                )
                             }
                         }
                     )
@@ -125,7 +130,7 @@ class MainViewModel : ViewModel() {
                         uiTextBuilder {
                             res(R.string.shopping_cart_status_insert_shopping_cart)
                         },
-                        SpanStyle(color = Color.Red)
+                        SpanStyle(color = Color.Red).asUITextAnnotation()
                     )
                 }
             }

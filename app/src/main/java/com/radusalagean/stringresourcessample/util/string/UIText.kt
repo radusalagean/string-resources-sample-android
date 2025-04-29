@@ -5,8 +5,8 @@ import android.content.res.Resources
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 
 sealed class UIText {
@@ -91,15 +91,15 @@ sealed class UIText {
     ): CharSequence {
         return buildAnnotatedString(
             resolvedArgs = resolvedArgs.map { it to null },
-            baseSpanStyle = null,
+            baseAnnotation = null,
             baseStringProvider = baseStringProvider
         )
     }
 
     protected fun buildAnnotatedString(
         context: Context,
-        args: List<Pair<Any?, SpanStyle?>>,
-        baseSpanStyle: SpanStyle?,
+        args: List<Pair<Any?, UITextAnnotation?>>,
+        baseAnnotation: UITextAnnotation?,
         baseStringProvider: () -> String
     ): CharSequence {
         val resolvedArgs = args.map {
@@ -107,14 +107,14 @@ sealed class UIText {
         }
         return buildAnnotatedString(
             resolvedArgs = resolvedArgs,
-            baseSpanStyle = baseSpanStyle,
+            baseAnnotation = baseAnnotation,
             baseStringProvider = baseStringProvider
         )
     }
 
     private fun buildAnnotatedString(
-        resolvedArgs: List<Pair<Any?, SpanStyle?>>,
-        baseSpanStyle: SpanStyle?,
+        resolvedArgs: List<Pair<Any?, UITextAnnotation?>>,
+        baseAnnotation: UITextAnnotation?,
         baseStringProvider: () -> String
     ): CharSequence {
         return buildAnnotatedString {
@@ -125,14 +125,14 @@ sealed class UIText {
             }.toList()
 
             parts.forEachIndexed { index, part ->
-                withStyleIfNeeded(baseSpanStyle) {
+                handleUITextAnnotation(baseAnnotation) {
                     append(part)
                     if (index !in placeholders.indices)
-                        return@withStyleIfNeeded
+                        return@handleUITextAnnotation
                     val placeholderIndex = placeholders[index]
-                    val style = resolvedArgs[placeholderIndex].second
+                    val uiTextAnnotation = resolvedArgs[placeholderIndex].second
                     val arg = resolvedArgs[placeholderIndex].first
-                    withStyleIfNeeded(style) {
+                    handleUITextAnnotation(uiTextAnnotation) {
                         appendAny(arg)
                     }
                 }
@@ -140,15 +140,28 @@ sealed class UIText {
         }
     }
 
-    private fun AnnotatedString.Builder.withStyleIfNeeded(
-        spanStyle: SpanStyle?,
+    private fun AnnotatedString.Builder.handleUITextAnnotation(
+        uiTextAnnotation: UITextAnnotation?,
         block: () -> Unit
     ) {
-        spanStyle?.let {
-            withStyle(it) {
-                block()
+        when (uiTextAnnotation) {
+            is UITextAnnotation.SpanStyle -> {
+                withStyle(uiTextAnnotation.spanStyle) {
+                    block()
+                }
             }
-        } ?: block()
+            is UITextAnnotation.ParagraphStyle -> {
+                withStyle(uiTextAnnotation.paragraphStyle) {
+                    block()
+                }
+            }
+            is UITextAnnotation.LinkAnnotation -> {
+                withLink(uiTextAnnotation.linkAnnotation) {
+                    block()
+                }
+            }
+            null -> block()
+        }
     }
 
     data class Raw(val text: CharSequence) : UIText() {
@@ -219,23 +232,23 @@ sealed class UIText {
         }
     }
 
-    data class ResSpanStyle(
+    data class ResAnnotated(
         @StringRes val resId: Int,
-        val args: List<Pair<Any?, SpanStyle?>>,
-        val baseSpanStyle: SpanStyle? = null
+        val args: List<Pair<Any?, UITextAnnotation?>>,
+        val baseAnnotation: UITextAnnotation? = null
     ) : UIText() {
 
         constructor(
             @StringRes resId: Int,
-            vararg args: Pair<Any?, SpanStyle?>,
-            baseSpanStyle: SpanStyle? = null
-        ) : this(resId, args.toList(), baseSpanStyle)
+            vararg args: Pair<Any?, UITextAnnotation?>,
+            baseAnnotation: UITextAnnotation? = null
+        ) : this(resId, args.toList(), baseAnnotation)
 
         override fun build(context: Context): CharSequence {
             return buildAnnotatedString(
                 context = context,
                 args = args,
-                baseSpanStyle = baseSpanStyle,
+                baseAnnotation = baseAnnotation,
                 baseStringProvider = {
                     context.resources.getStringWithPlaceholders(
                         resId = resId,
@@ -246,25 +259,25 @@ sealed class UIText {
         }
     }
 
-    data class PluralResSpanStyle(
+    data class PluralResAnnotated(
         @PluralsRes val resId: Int,
         val quantity: Int,
-        val args: List<Pair<Any?, SpanStyle?>>,
-        val baseSpanStyle: SpanStyle? = null
+        val args: List<Pair<Any?, UITextAnnotation?>>,
+        val baseAnnotation: UITextAnnotation? = null
     ) : UIText() {
 
         constructor(
             @PluralsRes resId: Int,
             quantity: Int,
-            vararg args: Pair<Any?, SpanStyle?>,
-            baseSpanStyle: SpanStyle? = null
-        ) : this(resId, quantity, args.toList(), baseSpanStyle)
+            vararg args: Pair<Any?, UITextAnnotation?>,
+            baseAnnotation: UITextAnnotation? = null
+        ) : this(resId, quantity, args.toList(), baseAnnotation)
 
         override fun build(context: Context): CharSequence {
             return buildAnnotatedString(
                 context = context,
                 args = args,
-                baseSpanStyle = baseSpanStyle,
+                baseAnnotation = baseAnnotation,
                 baseStringProvider = {
                     context.resources.getQuantityStringWithPlaceholders(
                         resId = resId,

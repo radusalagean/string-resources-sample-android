@@ -2,7 +2,6 @@ package com.radusalagean.stringresourcessample.util.string
 
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
-import androidx.compose.ui.text.SpanStyle
 
 @DslMarker
 annotation class UITextDsl
@@ -36,23 +35,23 @@ class UITextBuilder {
         components += UIText.PluralRes(resId, quantity, *args.toTypedArray())
     }
 
-    fun resSpanStyle(
+    fun resAnnotated(
         @StringRes resId: Int,
-        baseStyle: SpanStyle? = null,
-        block: StyledArgsBuilder.() -> Unit
+        baseAnnotation: UITextAnnotation? = null,
+        block: AnnotatedArgsBuilder.() -> Unit
     ) {
-        val styledArgs = StyledArgsBuilder().apply(block).build()
-        components += UIText.ResSpanStyle(resId, styledArgs, baseStyle)
+        val annotatedArgs = AnnotatedArgsBuilder().apply(block).build()
+        components += UIText.ResAnnotated(resId, annotatedArgs, baseAnnotation)
     }
 
-    fun pluralResSpanStyle(
+    fun pluralResAnnotated(
         @PluralsRes resId: Int,
         quantity: Int,
-        baseStyle: SpanStyle? = null,
-        block: StyledArgsBuilder.() -> Unit
+        baseAnnotation: UITextAnnotation? = null,
+        block: AnnotatedArgsBuilder.() -> Unit
     ) {
-        val styledArgs = StyledArgsBuilder().apply(block).build()
-        components += UIText.PluralResSpanStyle(resId, quantity, styledArgs, baseStyle)
+        val annotatedArgs = AnnotatedArgsBuilder().apply(block).build()
+        components += UIText.PluralResAnnotated(resId, quantity, annotatedArgs, baseAnnotation)
     }
 
     internal fun build(): UIText = when (components.size) {
@@ -78,17 +77,17 @@ class ArgsBuilder {
 }
 
 @UITextDsl
-class StyledArgsBuilder {
+class AnnotatedArgsBuilder {
 
-    private val args = mutableListOf<Pair<Any?, SpanStyle?>>()
+    private val args = mutableListOf<Pair<Any?, UITextAnnotation?>>()
 
-    fun arg(value: CharSequence?, style: SpanStyle? = null) {
+    fun arg(value: CharSequence?, style: UITextAnnotation? = null) {
         args += value to style
     }
 
-    fun arg(value: UIText?, style: SpanStyle? = null) {
+    fun arg(value: UIText?, style: UITextAnnotation? = null) {
         args += value to style
     }
 
-    fun build(): List<Pair<Any?, SpanStyle?>> = args
+    fun build(): List<Pair<Any?, UITextAnnotation?>> = args
 }

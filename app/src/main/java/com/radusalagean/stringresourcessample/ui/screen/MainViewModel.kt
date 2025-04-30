@@ -5,8 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.lifecycle.ViewModel
 import com.radusalagean.stringresourcessample.R
 import com.radusalagean.stringresourcessample.ui.component.ExampleEntryModel
@@ -132,6 +135,19 @@ class MainViewModel : ViewModel() {
                         SpanStyle(color = Color.Red)
                     )
                 }
+                raw(" ")
+                resAnnotated(
+                    resId = R.string.proceed_to_checkout,
+                    baseLinkAnnotation = LinkAnnotation.Url(
+                        url = "https://example.com",
+                        styles = TextLinkStyles(
+                            style = SpanStyle(
+                                color = Color.Blue,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    )
+                )
             }
         )
     )

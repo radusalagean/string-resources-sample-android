@@ -9,6 +9,7 @@
     <string name="greeting">Hi, %1$s!</string>
     <string name="shopping_cart_status">You have %1$s in your %2$s.</string>
     <string name="shopping_cart_status_insert_shopping_cart">shopping cart</string>
+    <string name="proceed_to_checkout">Proceed to checkout</string>
 
     <plurals name="products">
         <item quantity="one">%1$s product</item>

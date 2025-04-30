@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="section_title_language">Limba</string>
     <string name="language_english">engleză</string>
     <string name="language_romanian">română</string>
@@ -9,7 +8,7 @@
     <string name="greeting">Salut, %1$s!</string>
     <string name="shopping_cart_status">Ai %1$s în %2$s.</string>
     <string name="shopping_cart_status_insert_shopping_cart">coșul tău de cumpăraturi</string>
-    <string name="proceed_to_checkout">Finalizați comanda</string>
+    <string name="proceed_to_checkout">Finalizează comanda</string>
 
     <plurals name="products">
         <item quantity="one">%1$s produs</item>

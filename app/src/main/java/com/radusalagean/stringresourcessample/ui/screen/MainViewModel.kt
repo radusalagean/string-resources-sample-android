@@ -1,5 +1,6 @@
 package com.radusalagean.stringresourcessample.ui.screen
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +11,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import com.radusalagean.stringresourcessample.R
 import com.radusalagean.stringresourcessample.ui.component.ExampleEntryModel
@@ -33,13 +35,19 @@ class MainViewModel : ViewModel() {
             languageCode = "ro"
         )
     )
-    var selectedLanguageCode by mutableStateOf("en")
+    var selectedLanguageCode by mutableStateOf("")
     val selectedLanguageIndex: Int by derivedStateOf {
         languageOptions.indexOfFirst { it.languageCode == selectedLanguageCode }
     }
 
+    fun syncSelectedLanguage() {
+        val locales = AppCompatDelegate.getApplicationLocales()
+        selectedLanguageCode = locales.get(0)?.language ?: "en"
+    }
+
     fun onLanguageSelected(code: String) {
-        // TODO
+        val localesList = LocaleListCompat.forLanguageTags(code)
+        AppCompatDelegate.setApplicationLocales(localesList)
     }
 
     // Section: Examples

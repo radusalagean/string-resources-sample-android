@@ -41,7 +41,7 @@ class UITextBuilder {
     fun resAnnotated(
         @StringRes resId: Int,
         baseAnnotation: UITextAnnotation? = null,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = { }
     ) {
         val annotatedArgs = AnnotatedArgsBuilder().apply(block).build()
         components += UIText.ResAnnotated(resId, annotatedArgs, baseAnnotation)
@@ -49,7 +49,7 @@ class UITextBuilder {
 
     fun resAnnotated(
         @StringRes resId: Int,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = { }
     ) = resAnnotated(
         resId = resId,
         baseAnnotation = null,
@@ -59,7 +59,7 @@ class UITextBuilder {
     fun resAnnotated(
         @StringRes resId: Int,
         baseSpanStyle: SpanStyle,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = { }
     ) = resAnnotated(
         resId = resId,
         baseAnnotation = baseSpanStyle.uiTextAnnotation(),
@@ -69,7 +69,7 @@ class UITextBuilder {
     fun resAnnotated(
         @StringRes resId: Int,
         baseParagraphStyle: ParagraphStyle,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = { }
     ) = resAnnotated(
         resId = resId,
         baseAnnotation = baseParagraphStyle.uiTextAnnotation(),
@@ -79,7 +79,7 @@ class UITextBuilder {
     fun resAnnotated(
         @StringRes resId: Int,
         baseLinkAnnotation: LinkAnnotation,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = { }
     ) = resAnnotated(
         resId = resId,
         baseAnnotation = baseLinkAnnotation.uiTextAnnotation(),
@@ -90,7 +90,9 @@ class UITextBuilder {
         @PluralsRes resId: Int,
         quantity: Int,
         baseAnnotation: UITextAnnotation? = null,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = {
+            arg(quantity.toString())
+        }
     ) {
         val annotatedArgs = AnnotatedArgsBuilder().apply(block).build()
         components += UIText.PluralResAnnotated(resId, quantity, annotatedArgs, baseAnnotation)
@@ -99,7 +101,9 @@ class UITextBuilder {
     fun pluralResAnnotated(
         @PluralsRes resId: Int,
         quantity: Int,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = {
+            arg(quantity.toString())
+        }
     ) = pluralResAnnotated(
         resId = resId,
         quantity = quantity,
@@ -111,7 +115,9 @@ class UITextBuilder {
         @PluralsRes resId: Int,
         quantity: Int,
         baseSpanStyle: SpanStyle,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = {
+            arg(quantity.toString())
+        }
     ) = pluralResAnnotated(
         resId = resId,
         quantity = quantity,
@@ -123,7 +129,9 @@ class UITextBuilder {
         @PluralsRes resId: Int,
         quantity: Int,
         baseParagraphStyle: ParagraphStyle,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = {
+            arg(quantity.toString())
+        }
     ) = pluralResAnnotated(
         resId = resId,
         quantity = quantity,
@@ -135,7 +143,9 @@ class UITextBuilder {
         @PluralsRes resId: Int,
         quantity: Int,
         baseLinkAnnotation: LinkAnnotation,
-        block: AnnotatedArgsBuilder.() -> Unit
+        block: AnnotatedArgsBuilder.() -> Unit = {
+            arg(quantity.toString())
+        }
     ) = pluralResAnnotated(
         resId = resId,
         quantity = quantity,

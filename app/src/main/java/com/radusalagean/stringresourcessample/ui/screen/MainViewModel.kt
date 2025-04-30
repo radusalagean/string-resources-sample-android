@@ -13,7 +13,7 @@ import com.radusalagean.stringresourcessample.ui.component.ExampleEntryModel
 import com.radusalagean.stringresourcessample.ui.component.LanguageOption
 import com.radusalagean.stringresourcessample.ui.theme.CustomGreen
 import com.radusalagean.stringresourcessample.util.string.UIText
-import com.radusalagean.stringresourcessample.util.string.asUITextAnnotation
+import com.radusalagean.stringresourcessample.util.string.uiTextAnnotation
 import com.radusalagean.stringresourcessample.util.string.uiTextBuilder
 
 class MainViewModel : ViewModel() {
@@ -64,7 +64,7 @@ class MainViewModel : ViewModel() {
                 ) to null,
                 UIText.Res(
                     R.string.shopping_cart_status_insert_shopping_cart
-                ) to SpanStyle(color = Color.Red).asUITextAnnotation()
+                ) to SpanStyle(color = Color.Red).uiTextAnnotation()
             )
         ),
         ExampleEntryModel(
@@ -74,10 +74,10 @@ class MainViewModel : ViewModel() {
                 quantity = 30,
                 30 to SpanStyle(
                     color = CustomGreen
-                ).asUITextAnnotation(),
+                ).uiTextAnnotation(),
                 baseAnnotation = SpanStyle(
                     fontWeight = FontWeight.Bold
-                ).asUITextAnnotation()
+                ).uiTextAnnotation()
             )
         ),
         ExampleEntryModel(
@@ -92,14 +92,14 @@ class MainViewModel : ViewModel() {
                         quantity = 30,
                         30 to SpanStyle(
                             color = CustomGreen
-                        ).asUITextAnnotation(),
+                        ).uiTextAnnotation(),
                         baseAnnotation = SpanStyle(
                             fontWeight = FontWeight.Bold,
-                        ).asUITextAnnotation()
+                        ).uiTextAnnotation()
                     ) to null,
                     UIText.Res(
                         R.string.shopping_cart_status_insert_shopping_cart
-                    ) to SpanStyle(color = Color.Red).asUITextAnnotation()
+                    ) to SpanStyle(color = Color.Red).uiTextAnnotation()
                 )
             )
         ),
@@ -116,12 +116,11 @@ class MainViewModel : ViewModel() {
                             pluralResAnnotated(
                                 R.plurals.products,
                                 quantity = 30,
-                                baseAnnotation = SpanStyle(fontWeight = FontWeight.Bold)
-                                    .asUITextAnnotation()
+                                baseSpanStyle = SpanStyle(fontWeight = FontWeight.Bold)
                             ) {
                                 arg(
                                     30.toString(),
-                                    SpanStyle(color = CustomGreen).asUITextAnnotation()
+                                    SpanStyle(color = CustomGreen)
                                 )
                             }
                         }
@@ -130,7 +129,7 @@ class MainViewModel : ViewModel() {
                         uiTextBuilder {
                             res(R.string.shopping_cart_status_insert_shopping_cart)
                         },
-                        SpanStyle(color = Color.Red).asUITextAnnotation()
+                        SpanStyle(color = Color.Red)
                     )
                 }
             }

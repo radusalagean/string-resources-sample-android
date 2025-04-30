@@ -19,6 +19,6 @@ sealed interface UITextAnnotation {
     ) : UITextAnnotation
 }
 
-fun SpanStyle.asUITextAnnotation() = UITextAnnotation.SpanStyle(this)
-fun ParagraphStyle.asUITextAnnotation() = UITextAnnotation.ParagraphStyle(this)
-fun LinkAnnotation.asUITextAnnotation() = UITextAnnotation.LinkAnnotation(this)
+fun SpanStyle.uiTextAnnotation() = UITextAnnotation.SpanStyle(this)
+fun ParagraphStyle.uiTextAnnotation() = UITextAnnotation.ParagraphStyle(this)
+fun LinkAnnotation.uiTextAnnotation() = UITextAnnotation.LinkAnnotation(this)

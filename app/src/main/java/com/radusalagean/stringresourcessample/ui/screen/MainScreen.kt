@@ -33,12 +33,11 @@ fun MainScreen(
     val context = LocalContext.current
     StringResourcesSampleTheme {
         Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
-            Column(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().padding(innerPadding)) {
                 TopAppBar(
                     title = {
                         Text(stringResource(R.string.app_name))
-                    },
-                    modifier = Modifier.padding(innerPadding)
+                    }
                 )
                 Column(
                     modifier = Modifier

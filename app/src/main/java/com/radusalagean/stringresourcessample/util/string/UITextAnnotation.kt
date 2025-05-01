@@ -6,19 +6,25 @@ import androidx.compose.ui.text.SpanStyle
 
 sealed interface UITextAnnotation {
 
-    data class SpanStyle(
-        val spanStyle: androidx.compose.ui.text.SpanStyle
+    @JvmInline
+    value class Span(
+        val spanStyle: SpanStyle
     ) : UITextAnnotation
 
-    data class ParagraphStyle(
-        val paragraphStyle: androidx.compose.ui.text.ParagraphStyle
+    @JvmInline
+    value class Paragraph(
+        val paragraphStyle: ParagraphStyle
     ) : UITextAnnotation
 
-    data class LinkAnnotation(
-        val linkAnnotation: androidx.compose.ui.text.LinkAnnotation
+    @JvmInline
+    value class Link(
+        val linkAnnotation: LinkAnnotation
     ) : UITextAnnotation
 }
 
-fun SpanStyle.uiTextAnnotation() = UITextAnnotation.SpanStyle(this)
-fun ParagraphStyle.uiTextAnnotation() = UITextAnnotation.ParagraphStyle(this)
-fun LinkAnnotation.uiTextAnnotation() = UITextAnnotation.LinkAnnotation(this)
+fun SpanStyle.uiTextAnnotation() = UITextAnnotation.Span(this)
+fun SpanStyle.uiTextAnnotationList() = listOf(UITextAnnotation.Span(this))
+fun ParagraphStyle.uiTextAnnotation() = UITextAnnotation.Paragraph(this)
+fun ParagraphStyle.uiTextAnnotationList() = listOf(UITextAnnotation.Paragraph(this))
+fun LinkAnnotation.uiTextAnnotation() = UITextAnnotation.Link(this)
+fun LinkAnnotation.uiTextAnnotationList() = listOf(UITextAnnotation.Link(this))

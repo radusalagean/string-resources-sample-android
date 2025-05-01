@@ -91,15 +91,15 @@ sealed class UIText {
     ): CharSequence {
         return buildAnnotatedString(
             resolvedArgs = resolvedArgs.map { it to null },
-            baseAnnotation = null,
+            baseAnnotations = null,
             baseStringProvider = baseStringProvider
         )
     }
 
     protected fun buildAnnotatedString(
         context: Context,
-        args: List<Pair<Any?, UITextAnnotation?>>,
-        baseAnnotation: UITextAnnotation?,
+        args: List<Pair<Any?, List<UITextAnnotation>?>>,
+        baseAnnotations: List<UITextAnnotation>?,
         baseStringProvider: () -> String
     ): CharSequence {
         val resolvedArgs = args.map {
@@ -107,14 +107,14 @@ sealed class UIText {
         }
         return buildAnnotatedString(
             resolvedArgs = resolvedArgs,
-            baseAnnotation = baseAnnotation,
+            baseAnnotations = baseAnnotations,
             baseStringProvider = baseStringProvider
         )
     }
 
     private fun buildAnnotatedString(
-        resolvedArgs: List<Pair<Any?, UITextAnnotation?>>,
-        baseAnnotation: UITextAnnotation?,
+        resolvedArgs: List<Pair<Any?, List<UITextAnnotation>?>>,
+        baseAnnotations: List<UITextAnnotation>?,
         baseStringProvider: () -> String
     ): CharSequence {
         return buildAnnotatedString {
@@ -124,15 +124,15 @@ sealed class UIText {
                 it.groups[1]!!.value.toInt()
             }.toList()
 
-            parts.forEachIndexed { index, part ->
-                handleUITextAnnotation(baseAnnotation) {
+            handleUITextAnnotations(baseAnnotations) {
+                parts.forEachIndexed { index, part ->
                     append(part)
                     if (index !in placeholders.indices)
-                        return@handleUITextAnnotation
+                        return@handleUITextAnnotations
                     val placeholderIndex = placeholders[index]
-                    val uiTextAnnotation = resolvedArgs[placeholderIndex].second
+                    val uiTextAnnotations = resolvedArgs[placeholderIndex].second
                     val arg = resolvedArgs[placeholderIndex].first
-                    handleUITextAnnotation(uiTextAnnotation) {
+                    handleUITextAnnotations(uiTextAnnotations) {
                         appendAny(arg)
                     }
                 }
@@ -140,28 +140,42 @@ sealed class UIText {
         }
     }
 
-    private fun AnnotatedString.Builder.handleUITextAnnotation(
-        uiTextAnnotation: UITextAnnotation?,
+    private fun AnnotatedString.Builder.handleUITextAnnotations(
+        uiTextAnnotations: List<UITextAnnotation>?,
         block: () -> Unit
     ) {
-        when (uiTextAnnotation) {
-            is UITextAnnotation.SpanStyle -> {
-                withStyle(uiTextAnnotation.spanStyle) {
-                    block()
-                }
-            }
-            is UITextAnnotation.ParagraphStyle -> {
-                withStyle(uiTextAnnotation.paragraphStyle) {
-                    block()
-                }
-            }
-            is UITextAnnotation.LinkAnnotation -> {
-                withLink(uiTextAnnotation.linkAnnotation) {
-                    block()
-                }
-            }
-            null -> block()
+
+        if (uiTextAnnotations.isNullOrEmpty()) {
+            block()
+            return
         }
+
+        fun applyAnnotation(index: Int) {
+            if (index >= uiTextAnnotations.size) {
+                block()
+                return
+            }
+
+            when (val annotation = uiTextAnnotations[index]) {
+                is UITextAnnotation.Span -> {
+                    withStyle(annotation.spanStyle) {
+                        applyAnnotation(index + 1)
+                    }
+                }
+                is UITextAnnotation.Paragraph -> {
+                    withStyle(annotation.paragraphStyle) {
+                        applyAnnotation(index + 1)
+                    }
+                }
+                is UITextAnnotation.Link -> {
+                    withLink(annotation.linkAnnotation) {
+                        applyAnnotation(index + 1)
+                    }
+                }
+            }
+        }
+
+        applyAnnotation(0)
     }
 
     data class Raw(val text: CharSequence) : UIText() {
@@ -234,21 +248,21 @@ sealed class UIText {
 
     data class ResAnnotated(
         @StringRes val resId: Int,
-        val args: List<Pair<Any?, UITextAnnotation?>>,
-        val baseAnnotation: UITextAnnotation? = null
+        val args: List<Pair<Any?, List<UITextAnnotation>?>>,
+        val baseAnnotations: List<UITextAnnotation>? = null
     ) : UIText() {
 
         constructor(
             @StringRes resId: Int,
-            vararg args: Pair<Any?, UITextAnnotation?>,
-            baseAnnotation: UITextAnnotation? = null
-        ) : this(resId, args.toList(), baseAnnotation)
+            vararg args: Pair<Any?, List<UITextAnnotation>?>,
+            baseAnnotations: List<UITextAnnotation>? = null
+        ) : this(resId, args.toList(), baseAnnotations)
 
         override fun build(context: Context): CharSequence {
             return buildAnnotatedString(
                 context = context,
                 args = args,
-                baseAnnotation = baseAnnotation,
+                baseAnnotations = baseAnnotations,
                 baseStringProvider = {
                     context.resources.getStringWithPlaceholders(
                         resId = resId,
@@ -262,22 +276,22 @@ sealed class UIText {
     data class PluralResAnnotated(
         @PluralsRes val resId: Int,
         val quantity: Int,
-        val args: List<Pair<Any?, UITextAnnotation?>>,
-        val baseAnnotation: UITextAnnotation? = null
+        val args: List<Pair<Any?, List<UITextAnnotation>?>>,
+        val baseAnnotations: List<UITextAnnotation>? = null
     ) : UIText() {
 
         constructor(
             @PluralsRes resId: Int,
             quantity: Int,
-            vararg args: Pair<Any?, UITextAnnotation?>,
-            baseAnnotation: UITextAnnotation? = null
-        ) : this(resId, quantity, args.toList(), baseAnnotation)
+            vararg args: Pair<Any?, List<UITextAnnotation>?>,
+            baseAnnotations: List<UITextAnnotation>? = null
+        ) : this(resId, quantity, args.toList(), baseAnnotations)
 
         override fun build(context: Context): CharSequence {
             return buildAnnotatedString(
                 context = context,
                 args = args,
-                baseAnnotation = baseAnnotation,
+                baseAnnotations = baseAnnotations,
                 baseStringProvider = {
                     context.resources.getQuantityStringWithPlaceholders(
                         resId = resId,

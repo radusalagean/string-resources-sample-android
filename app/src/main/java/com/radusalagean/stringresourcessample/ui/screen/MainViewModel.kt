@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
@@ -18,7 +19,7 @@ import com.radusalagean.stringresourcessample.ui.component.ExampleEntryModel
 import com.radusalagean.stringresourcessample.ui.component.LanguageOption
 import com.radusalagean.stringresourcessample.ui.theme.CustomGreen
 import com.radusalagean.stringresourcessample.util.string.UIText
-import com.radusalagean.stringresourcessample.util.string.uiTextAnnotation
+import com.radusalagean.stringresourcessample.util.string.uiTextAnnotationList
 import com.radusalagean.stringresourcessample.util.string.uiTextBuilder
 
 class MainViewModel : ViewModel() {
@@ -75,7 +76,7 @@ class MainViewModel : ViewModel() {
                 ) to null,
                 UIText.Res(
                     R.string.shopping_cart_status_insert_shopping_cart
-                ) to SpanStyle(color = Color.Red).uiTextAnnotation()
+                ) to SpanStyle(color = Color.Red).uiTextAnnotationList()
             )
         ),
         ExampleEntryModel(
@@ -85,10 +86,10 @@ class MainViewModel : ViewModel() {
                 quantity = 30,
                 30 to SpanStyle(
                     color = CustomGreen
-                ).uiTextAnnotation(),
-                baseAnnotation = SpanStyle(
+                ).uiTextAnnotationList(),
+                baseAnnotations = SpanStyle(
                     fontWeight = FontWeight.Bold
-                ).uiTextAnnotation()
+                ).uiTextAnnotationList()
             )
         ),
         ExampleEntryModel(
@@ -103,19 +104,19 @@ class MainViewModel : ViewModel() {
                         quantity = 30,
                         30 to SpanStyle(
                             color = CustomGreen
-                        ).uiTextAnnotation(),
-                        baseAnnotation = SpanStyle(
+                        ).uiTextAnnotationList(),
+                        baseAnnotations = SpanStyle(
                             fontWeight = FontWeight.Bold,
-                        ).uiTextAnnotation()
+                        ).uiTextAnnotationList()
                     ) to null,
                     UIText.Res(
                         R.string.shopping_cart_status_insert_shopping_cart
-                    ) to SpanStyle(color = Color.Red).uiTextAnnotation()
+                    ) to SpanStyle(color = Color.Red).uiTextAnnotationList()
                 )
             )
         ),
         ExampleEntryModel(
-            label = UIText.Raw("DSL Builder"),
+            label = UIText.Raw("DSL Builder - Example 1"),
             value = uiTextBuilder {
                 res(R.string.greeting) {
                     arg("Radu")
@@ -144,6 +145,50 @@ class MainViewModel : ViewModel() {
                     )
                 }
                 raw(" ")
+                resAnnotated(
+                    resId = R.string.proceed_to_checkout,
+                    baseLinkAnnotation = LinkAnnotation.Url(
+                        url = "https://example.com",
+                        styles = TextLinkStyles(
+                            style = SpanStyle(
+                                color = Color.Blue,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    )
+                )
+            }
+        ),
+        ExampleEntryModel(
+            label = UIText.Raw("DSL Builder - Example 2"),
+            value = uiTextBuilder {
+                res(R.string.greeting) {
+                    arg("Radu")
+                }
+                resAnnotated(R.string.shopping_cart_status, {
+                    paragraph(ParagraphStyle())
+                }) {
+                    arg(
+                        uiTextBuilder {
+                            pluralResAnnotated(
+                                R.plurals.products,
+                                quantity = 30,
+                                baseSpanStyle = SpanStyle(fontWeight = FontWeight.Bold)
+                            ) {
+                                arg(
+                                    30.toString(),
+                                    SpanStyle(color = CustomGreen)
+                                )
+                            }
+                        }
+                    )
+                    arg(
+                        uiTextBuilder {
+                            res(R.string.shopping_cart_status_insert_shopping_cart)
+                        },
+                        SpanStyle(color = Color.Red)
+                    )
+                }
                 resAnnotated(
                     resId = R.string.proceed_to_checkout,
                     baseLinkAnnotation = LinkAnnotation.Url(

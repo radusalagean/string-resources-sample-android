@@ -9,7 +9,7 @@ import androidx.compose.ui.text.SpanStyle
 @DslMarker
 annotation class UITextDslMarker
 
-fun uiTextBuilder(block: UITextBuilder.() -> Unit): UIText = UITextBuilder().apply(block).build()
+fun buildUIText(block: UITextBuilder.() -> Unit): UIText = UITextBuilder().apply(block).build()
 
 @UITextDslMarker
 class UITextBuilder {

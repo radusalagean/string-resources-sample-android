@@ -20,7 +20,7 @@ import com.radusalagean.stringresourcessample.ui.component.LanguageOption
 import com.radusalagean.stringresourcessample.ui.theme.CustomGreen
 import com.radusalagean.stringresourcessample.util.string.UIText
 import com.radusalagean.stringresourcessample.util.string.uiTextAnnotationList
-import com.radusalagean.stringresourcessample.util.string.uiTextBuilder
+import com.radusalagean.stringresourcessample.util.string.buildUIText
 
 class MainViewModel : ViewModel() {
 
@@ -117,14 +117,14 @@ class MainViewModel : ViewModel() {
         ),
         ExampleEntryModel(
             label = UIText.Raw("DSL Builder - Example 1"),
-            value = uiTextBuilder {
+            value = buildUIText {
                 res(R.string.greeting) {
                     arg("Radu")
                 }
                 raw(" ")
                 resAnnotated(R.string.shopping_cart_status) {
                     arg(
-                        uiTextBuilder {
+                        buildUIText {
                             pluralResAnnotated(
                                 R.plurals.products,
                                 quantity = 30,
@@ -138,7 +138,7 @@ class MainViewModel : ViewModel() {
                         }
                     )
                     arg(
-                        uiTextBuilder {
+                        buildUIText {
                             res(R.string.shopping_cart_status_insert_shopping_cart)
                         },
                         SpanStyle(color = Color.Red)
@@ -161,7 +161,7 @@ class MainViewModel : ViewModel() {
         ),
         ExampleEntryModel(
             label = UIText.Raw("DSL Builder - Example 2"),
-            value = uiTextBuilder {
+            value = buildUIText {
                 res(R.string.greeting) {
                     arg("Radu")
                 }
@@ -169,7 +169,7 @@ class MainViewModel : ViewModel() {
                     paragraph(ParagraphStyle())
                 }) {
                     arg(
-                        uiTextBuilder {
+                        buildUIText {
                             pluralResAnnotated(
                                 R.plurals.products,
                                 quantity = 30,
@@ -183,7 +183,7 @@ class MainViewModel : ViewModel() {
                         }
                     )
                     arg(
-                        uiTextBuilder {
+                        buildUIText {
                             res(R.string.shopping_cart_status_insert_shopping_cart)
                         },
                         SpanStyle(color = Color.Red)
@@ -205,7 +205,7 @@ class MainViewModel : ViewModel() {
         ),
         ExampleEntryModel(
             label = UIText.Raw("DSL Builder - Example 3"),
-            value = uiTextBuilder {
+            value = buildUIText {
                 val linkStyle = TextLinkStyles(
                     SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)
                 )

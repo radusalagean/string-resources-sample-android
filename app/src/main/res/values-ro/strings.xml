@@ -10,6 +10,10 @@
     <string name="shopping_cart_status_insert_shopping_cart">coșul tău de cumpăraturi</string>
     <string name="proceed_to_checkout">Finalizează comanda</string>
 
+    <string name="legal_footer_example">Așa poți crea un text cu link-uri pentru %s și %s.</string>
+    <string name="legal_footer_example_insert_terms_of_service">Termeni și condiții</string>
+    <string name="legal_footer_example_insert_privacy_policy">Politica de Confidențialitate</string>
+
     <plurals name="products">
         <item quantity="one">%1$s produs</item>
         <item quantity="few">%1$s produse</item>

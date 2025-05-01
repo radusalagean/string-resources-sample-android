@@ -11,6 +11,10 @@
     <string name="shopping_cart_status_insert_shopping_cart">shopping cart</string>
     <string name="proceed_to_checkout">Proceed to checkout</string>
 
+    <string name="legal_footer_example">This is how you can create a %s and %s text with links.</string>
+    <string name="legal_footer_example_insert_terms_of_service">Terms of Service</string>
+    <string name="legal_footer_example_insert_privacy_policy">Privacy Policy</string>
+
     <plurals name="products">
         <item quantity="one">%1$s product</item>
         <item quantity="other">%1$s products</item>

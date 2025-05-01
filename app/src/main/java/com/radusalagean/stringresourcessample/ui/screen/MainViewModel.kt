@@ -202,6 +202,30 @@ class MainViewModel : ViewModel() {
                     )
                 )
             }
+        ),
+        ExampleEntryModel(
+            label = UIText.Raw("DSL Builder - Example 3"),
+            value = uiTextBuilder {
+                val linkStyle = TextLinkStyles(
+                    SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)
+                )
+                resAnnotated(R.string.legal_footer_example) {
+                    arg(
+                        value = UIText.Res(R.string.legal_footer_example_insert_terms_of_service),
+                        linkAnnotation = LinkAnnotation.Url(
+                            url = "https://radusalagean.com/example-terms-of-service/",
+                            styles = linkStyle
+                        )
+                    )
+                    arg(
+                        value = UIText.Res(R.string.legal_footer_example_insert_privacy_policy),
+                        linkAnnotation = LinkAnnotation.Url(
+                            url = "https://radusalagean.com/example-privacy-policy/",
+                            styles = linkStyle
+                        )
+                    )
+                }
+            }
         )
     )
 }

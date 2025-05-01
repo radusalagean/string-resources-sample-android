@@ -44,6 +44,7 @@ fun MainScreen(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
+                        .padding(bottom = 42.dp)
                 ) {
                     Section(title = viewModel.languageSectionTitle) {
                         Row(

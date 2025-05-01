@@ -7,11 +7,11 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 
 @DslMarker
-annotation class UITextDsl
+annotation class UITextDslMarker
 
 fun uiTextBuilder(block: UITextBuilder.() -> Unit): UIText = UITextBuilder().apply(block).build()
 
-@UITextDsl
+@UITextDslMarker
 class UITextBuilder {
     private val components = mutableListOf<UIText>()
 
@@ -160,7 +160,7 @@ class UITextBuilder {
     }
 }
 
-@UITextDsl
+@UITextDslMarker
 class ArgsBuilder {
     private val args = mutableListOf<Any?>()
 
@@ -175,7 +175,7 @@ class ArgsBuilder {
     fun build(): List<Any?> = args
 }
 
-@UITextDsl
+@UITextDslMarker
 class AnnotatedArgsBuilder {
 
     private val args = mutableListOf<Pair<Any?, UITextAnnotation?>>()

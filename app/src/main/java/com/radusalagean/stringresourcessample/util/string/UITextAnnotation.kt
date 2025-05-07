@@ -21,10 +21,3 @@ sealed interface UITextAnnotation {
         val linkAnnotation: LinkAnnotation
     ) : UITextAnnotation
 }
-
-fun SpanStyle.uiTextAnnotation() = UITextAnnotation.Span(this)
-fun SpanStyle.uiTextAnnotationList() = listOf(UITextAnnotation.Span(this))
-fun ParagraphStyle.uiTextAnnotation() = UITextAnnotation.Paragraph(this)
-fun ParagraphStyle.uiTextAnnotationList() = listOf(UITextAnnotation.Paragraph(this))
-fun LinkAnnotation.uiTextAnnotation() = UITextAnnotation.Link(this)
-fun LinkAnnotation.uiTextAnnotationList() = listOf(UITextAnnotation.Link(this))

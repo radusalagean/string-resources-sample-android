@@ -19,20 +19,18 @@ import com.radusalagean.stringresourcessample.ui.component.ExampleEntryModel
 import com.radusalagean.stringresourcessample.ui.component.LanguageOption
 import com.radusalagean.stringresourcessample.ui.theme.CustomGreen
 import com.radusalagean.stringresourcessample.util.string.UIText
-import com.radusalagean.stringresourcessample.util.string.uiTextAnnotationList
-import com.radusalagean.stringresourcessample.util.string.buildUIText
 
 class MainViewModel : ViewModel() {
 
     // Section: Language
-    val languageSectionTitle = UIText.Res(R.string.section_title_language)
+    val languageSectionTitle = UIText { res(R.string.section_title_language) }
     val languageOptions = listOf(
         LanguageOption(
-            uiText = UIText.Res(R.string.language_english),
+            uiText = UIText { res(R.string.language_english) },
             languageCode = "en"
         ),
         LanguageOption(
-            uiText = UIText.Res(R.string.language_romanian),
+            uiText = UIText { res(R.string.language_romanian) },
             languageCode = "ro"
         )
     )
@@ -52,102 +50,115 @@ class MainViewModel : ViewModel() {
     }
 
     // Section: Examples
-    val examplesSectionTitle = UIText.Res(R.string.section_title_examples)
+    val examplesSectionTitle = UIText { res(R.string.section_title_examples) }
     val exampleEntries = listOf(
         ExampleEntryModel(
-            label = UIText.Raw("UIText.Raw"),
-            value = UIText.Raw("Radu")
+            label = "raw",
+            value = UIText {
+                raw("Radu")
+            }
         ),
         ExampleEntryModel(
-            label = UIText.Raw("UIText.Res"),
-            value = UIText.Res(R.string.greeting, "Radu")
+            label = "res",
+            value = UIText {
+                res(R.string.greeting) {
+                    arg("Radu")
+                }
+            }
         ),
         ExampleEntryModel(
-            label = UIText.Raw("UIText.PluralRes"),
-            value = UIText.PluralRes(R.plurals.products, 30)
+            label = "pluralRes",
+            value = UIText {
+                pluralRes(R.plurals.products, 30)
+            }
         ),
         ExampleEntryModel(
-            label = UIText.Raw("UIText.ResAnnotated"),
-            value = UIText.ResAnnotated(
-                R.string.shopping_cart_status,
-                UIText.PluralRes(
-                    R.plurals.products,
-                    30
-                ) to null,
-                UIText.Res(
-                    R.string.shopping_cart_status_insert_shopping_cart
-                ) to SpanStyle(color = Color.Red).uiTextAnnotationList()
-            )
+            label = "res - annotated",
+            value = UIText {
+                res(R.string.shopping_cart_status) {
+                    arg(
+                        UIText {
+                            pluralRes(R.plurals.products, 30)
+                        }
+                    )
+                    arg(
+                        UIText {
+                            res(R.string.shopping_cart_status_insert_shopping_cart) {
+                                +SpanStyle(color = Color.Red)
+                            }
+                        }
+                    )
+                }
+            }
         ),
         ExampleEntryModel(
-            label = UIText.Raw("UIText.PluralResAnnotated"),
-            value = UIText.PluralResAnnotated(
-                R.plurals.products,
-                quantity = 30,
-                30 to SpanStyle(
-                    color = CustomGreen
-                ).uiTextAnnotationList(),
-                baseAnnotations = SpanStyle(
-                    fontWeight = FontWeight.Bold
-                ).uiTextAnnotationList()
-            )
+            label = "pluralRes - annotated",
+            value = UIText {
+                pluralRes(R.plurals.products, 30) {
+                    arg(30.toString()) {
+                        +SpanStyle(color = CustomGreen)
+                    }
+                    +SpanStyle(fontWeight = FontWeight.Bold)
+                }
+            }
         ),
         ExampleEntryModel(
-            label = UIText.Raw("UIText.Compound"),
-            value = UIText.Compound(
-                UIText.Res(R.string.greeting, "Radu"),
-                UIText.Raw(" "),
-                UIText.ResAnnotated(
-                    R.string.shopping_cart_status,
-                    UIText.PluralResAnnotated(
-                        R.plurals.products,
-                        quantity = 30,
-                        30 to SpanStyle(
-                            color = CustomGreen
-                        ).uiTextAnnotationList(),
-                        baseAnnotations = SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                        ).uiTextAnnotationList()
-                    ) to null,
-                    UIText.Res(
-                        R.string.shopping_cart_status_insert_shopping_cart
-                    ) to SpanStyle(color = Color.Red).uiTextAnnotationList()
-                )
-            )
-        ),
-        ExampleEntryModel(
-            label = UIText.Raw("DSL Builder - Example 1"),
-            value = buildUIText {
+            label = "compound - example 1",
+            value = UIText {
                 res(R.string.greeting) {
                     arg("Radu")
                 }
                 raw(" ")
-                resAnnotated(R.string.shopping_cart_status) {
+                res(R.string.shopping_cart_status) {
                     arg(
-                        buildUIText {
-                            pluralResAnnotated(
-                                R.plurals.products,
-                                quantity = 30,
-                                baseSpanStyle = SpanStyle(fontWeight = FontWeight.Bold)
-                            ) {
-                                arg(
-                                    30.toString(),
-                                    SpanStyle(color = CustomGreen)
-                                )
+                        UIText {
+                            pluralRes(R.plurals.products, 30) {
+                                arg(30.toString()) {
+                                    +SpanStyle(color = CustomGreen)
+                                }
+                                +SpanStyle(fontWeight = FontWeight.Bold)
                             }
                         }
                     )
                     arg(
-                        buildUIText {
-                            res(R.string.shopping_cart_status_insert_shopping_cart)
-                        },
-                        SpanStyle(color = Color.Red)
+                        UIText {
+                            res(R.string.shopping_cart_status_insert_shopping_cart) {
+                                +SpanStyle(color = Color.Red)
+                            }
+                        }
                     )
                 }
+            }
+        ),
+        ExampleEntryModel(
+            label = "compound - example 2",
+            value = UIText {
+                res(R.string.greeting) {
+                    arg("Radu")
+                }
                 raw(" ")
-                resAnnotated(
-                    resId = R.string.proceed_to_checkout,
-                    baseLinkAnnotation = LinkAnnotation.Url(
+                res(R.string.shopping_cart_status) {
+                    arg(
+                        UIText {
+                            pluralRes(R.plurals.products, 30) {
+                                arg(30.toString()) {
+                                    +SpanStyle(color = CustomGreen)
+                                }
+                                +SpanStyle(fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    )
+                    arg(
+                        UIText {
+                            res(R.string.shopping_cart_status_insert_shopping_cart)
+                        }
+                    ) {
+                        +SpanStyle(color = Color.Red)
+                    }
+                }
+                raw(" ")
+                res(R.string.proceed_to_checkout) {
+                    +LinkAnnotation.Url(
                         url = "https://example.com",
                         styles = TextLinkStyles(
                             style = SpanStyle(
@@ -156,42 +167,37 @@ class MainViewModel : ViewModel() {
                             )
                         )
                     )
-                )
+                }
             }
         ),
         ExampleEntryModel(
-            label = UIText.Raw("DSL Builder - Example 2"),
-            value = buildUIText {
+            label = "compound - example 3",
+            value = UIText {
                 res(R.string.greeting) {
                     arg("Radu")
                 }
-                resAnnotated(R.string.shopping_cart_status, {
-                    paragraph(ParagraphStyle())
-                }) {
+                res(R.string.shopping_cart_status) {
+                    +ParagraphStyle()
                     arg(
-                        buildUIText {
-                            pluralResAnnotated(
-                                R.plurals.products,
-                                quantity = 30,
-                                baseSpanStyle = SpanStyle(fontWeight = FontWeight.Bold)
-                            ) {
-                                arg(
-                                    30.toString(),
-                                    SpanStyle(color = CustomGreen)
-                                )
+                        UIText {
+                            pluralRes(R.plurals.products, 30) {
+                                +SpanStyle(fontWeight = FontWeight.Bold)
+                                arg(30.toString()) {
+                                    +SpanStyle(color = CustomGreen)
+                                }
                             }
                         }
                     )
                     arg(
-                        buildUIText {
+                        UIText {
                             res(R.string.shopping_cart_status_insert_shopping_cart)
-                        },
-                        SpanStyle(color = Color.Red)
-                    )
+                        }
+                    ) {
+                        +SpanStyle(color = Color.Red)
+                    }
                 }
-                resAnnotated(
-                    resId = R.string.proceed_to_checkout,
-                    baseLinkAnnotation = LinkAnnotation.Url(
+                res(R.string.proceed_to_checkout) {
+                    +LinkAnnotation.Url(
                         url = "https://example.com",
                         styles = TextLinkStyles(
                             style = SpanStyle(
@@ -200,30 +206,36 @@ class MainViewModel : ViewModel() {
                             )
                         )
                     )
-                )
+                }
             }
         ),
         ExampleEntryModel(
-            label = UIText.Raw("DSL Builder - Example 3"),
-            value = buildUIText {
+            label = "terms of service & privacy policy",
+            value = UIText {
                 val linkStyle = TextLinkStyles(
                     SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)
                 )
-                resAnnotated(R.string.legal_footer_example) {
+                res(R.string.legal_footer_example) {
                     arg(
-                        value = UIText.Res(R.string.legal_footer_example_insert_terms_of_service),
-                        linkAnnotation = LinkAnnotation.Url(
+                        UIText {
+                            res(R.string.legal_footer_example_insert_terms_of_service)
+                        }
+                    ) {
+                        +LinkAnnotation.Url(
                             url = "https://radusalagean.com/example-terms-of-service/",
                             styles = linkStyle
                         )
-                    )
+                    }
                     arg(
-                        value = UIText.Res(R.string.legal_footer_example_insert_privacy_policy),
-                        linkAnnotation = LinkAnnotation.Url(
+                        UIText {
+                            res(R.string.legal_footer_example_insert_privacy_policy)
+                        }
+                    ) {
+                        +LinkAnnotation.Url(
                             url = "https://radusalagean.com/example-privacy-policy/",
                             styles = linkStyle
                         )
-                    )
+                    }
                 }
             }
         )

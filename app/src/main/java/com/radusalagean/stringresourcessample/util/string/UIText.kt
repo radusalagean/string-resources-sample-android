@@ -36,18 +36,10 @@ sealed class UIText {
         }
     }
 
-    private fun resolveArg(context: Context, arg: Any?) = when (arg) {
+    protected fun resolveArg(context: Context, arg: Any?) = when (arg) {
         is UIText -> arg.build(context)
         else -> arg
     }
-
-    protected fun resolveArgs(context: Context, args: List<Any?>?): List<Any?>? {
-        args?.takeIf { it.isNotEmpty() } ?: return null
-        return args.map {
-            resolveArg(context, it)
-        }
-    }
-
 
     /**
      * In order to work around the default behavior of Android's getString(...) which will
@@ -86,35 +78,8 @@ sealed class UIText {
     )
 
     protected fun buildAnnotatedString(
-        resolvedArgs: List<Any?>,
-        baseStringProvider: () -> String
-    ): CharSequence {
-        return buildAnnotatedString(
-            resolvedArgs = resolvedArgs.map { it to null },
-            baseAnnotations = null,
-            baseStringProvider = baseStringProvider
-        )
-    }
-
-    protected fun buildAnnotatedString(
-        context: Context,
-        args: List<Pair<Any?, List<UITextAnnotation>?>>,
-        baseAnnotations: List<UITextAnnotation>?,
-        baseStringProvider: () -> String
-    ): CharSequence {
-        val resolvedArgs = args.map {
-            resolveArg(context, it.first) to it.second
-        }
-        return buildAnnotatedString(
-            resolvedArgs = resolvedArgs,
-            baseAnnotations = baseAnnotations,
-            baseStringProvider = baseStringProvider
-        )
-    }
-
-    private fun buildAnnotatedString(
-        resolvedArgs: List<Pair<Any?, List<UITextAnnotation>?>>,
-        baseAnnotations: List<UITextAnnotation>?,
+        resolvedArgs: List<Pair<Any?, List<UITextAnnotation>>>,
+        baseAnnotations: List<UITextAnnotation>,
         baseStringProvider: () -> String
     ): CharSequence {
         return buildAnnotatedString {
@@ -141,11 +106,11 @@ sealed class UIText {
     }
 
     private fun AnnotatedString.Builder.handleUITextAnnotations(
-        uiTextAnnotations: List<UITextAnnotation>?,
+        uiTextAnnotations: List<UITextAnnotation>,
         block: () -> Unit
     ) {
 
-        if (uiTextAnnotations.isNullOrEmpty()) {
+        if (uiTextAnnotations.isEmpty()) {
             block()
             return
         }
@@ -185,53 +150,57 @@ sealed class UIText {
         }
     }
 
-    class Res(
+    data class Res(
         @StringRes val resId: Int,
-        val args: List<Any?> = emptyList()
+        val args: List<Pair<Any?, List<UITextAnnotation>>>,
+        val baseAnnotations: List<UITextAnnotation>
     ) : UIText() {
 
-        constructor(
-            @StringRes resId: Int,
-            vararg args: Any?
-        ) : this(resId, args.toList())
-
         override fun build(context: Context): CharSequence {
-            val resolvedArgs = resolveArgs(context, args)
-            return resolvedArgs?.takeIf { it.isNotEmpty() }?.let {
-                if (it.any { it is AnnotatedString}) {
-                    buildAnnotatedString(
-                        resolvedArgs = resolvedArgs,
-                        baseStringProvider = {
-                            context.resources.getStringWithPlaceholders(
-                                resId = resId,
-                                placeholdersCount = args.size
-                            )
-                        }
-                    )
-                } else {
-                    context.getString(resId, *resolvedArgs.toTypedArray())
-                }
-            } ?: context.getString(resId)
+            val resolvedArgs = args.map {
+                resolveArg(context, it.first) to it.second
+            }
+            val annotated = baseAnnotations.isNotEmpty() ||
+                    args.any { it.second.isNotEmpty() } ||
+                    resolvedArgs.any { it.first is AnnotatedString }
+            return if (annotated) {
+                buildAnnotatedString(
+                    resolvedArgs = resolvedArgs,
+                    baseAnnotations = baseAnnotations,
+                    baseStringProvider = {
+                        context.resources.getStringWithPlaceholders(
+                            resId = resId,
+                            placeholdersCount = args.size
+                        )
+                    }
+                )
+            } else if (resolvedArgs.isNotEmpty()) {
+                context.getString(resId, *resolvedArgs.map { it.first }.toTypedArray())
+            } else {
+                context.getString(resId)
+            }
         }
     }
 
     data class PluralRes(
         @PluralsRes val resId: Int,
         val quantity: Int,
-        val args: List<Any?> = listOf(quantity)
+        val args: List<Pair<Any?, List<UITextAnnotation>>>,
+        val baseAnnotations: List<UITextAnnotation>
     ) : UIText() {
 
-        constructor(
-            @PluralsRes resId: Int,
-            quantity: Int,
-            vararg args: Any?
-        ) : this(resId, quantity, args.toList())
-
         override fun build(context: Context): CharSequence {
-            val resolvedArgs = resolveArgs(context, args) ?: emptyList()
-            return if (resolvedArgs.any { it is AnnotatedString }) {
+            val resolvedArgs = args.map {
+                resolveArg(context, it.first) to it.second
+            }
+            val annotated = baseAnnotations.isNotEmpty() ||
+                    args.any { it.second.isNotEmpty() } ||
+                    resolvedArgs.any { it.first is AnnotatedString }
+
+            return if (annotated) {
                 buildAnnotatedString(
                     resolvedArgs = resolvedArgs,
+                    baseAnnotations = baseAnnotations,
                     baseStringProvider = {
                         context.resources.getQuantityStringWithPlaceholders(
                             resId = resId,
@@ -240,74 +209,18 @@ sealed class UIText {
                         )
                     }
                 )
+            } else if (resolvedArgs.isNotEmpty()) {
+                context.resources.getQuantityString(resId, quantity,
+                    *resolvedArgs.map { it.first }.toTypedArray())
             } else {
-                context.resources.getQuantityString(resId, quantity, *resolvedArgs.toTypedArray())
+                context.resources.getQuantityString(resId, quantity)
             }
-        }
-    }
-
-    data class ResAnnotated(
-        @StringRes val resId: Int,
-        val args: List<Pair<Any?, List<UITextAnnotation>?>>,
-        val baseAnnotations: List<UITextAnnotation>? = null
-    ) : UIText() {
-
-        constructor(
-            @StringRes resId: Int,
-            vararg args: Pair<Any?, List<UITextAnnotation>?>,
-            baseAnnotations: List<UITextAnnotation>? = null
-        ) : this(resId, args.toList(), baseAnnotations)
-
-        override fun build(context: Context): CharSequence {
-            return buildAnnotatedString(
-                context = context,
-                args = args,
-                baseAnnotations = baseAnnotations,
-                baseStringProvider = {
-                    context.resources.getStringWithPlaceholders(
-                        resId = resId,
-                        placeholdersCount = args.size
-                    )
-                }
-            )
-        }
-    }
-
-    data class PluralResAnnotated(
-        @PluralsRes val resId: Int,
-        val quantity: Int,
-        val args: List<Pair<Any?, List<UITextAnnotation>?>>,
-        val baseAnnotations: List<UITextAnnotation>? = null
-    ) : UIText() {
-
-        constructor(
-            @PluralsRes resId: Int,
-            quantity: Int,
-            vararg args: Pair<Any?, List<UITextAnnotation>?>,
-            baseAnnotations: List<UITextAnnotation>? = null
-        ) : this(resId, quantity, args.toList(), baseAnnotations)
-
-        override fun build(context: Context): CharSequence {
-            return buildAnnotatedString(
-                context = context,
-                args = args,
-                baseAnnotations = baseAnnotations,
-                baseStringProvider = {
-                    context.resources.getQuantityStringWithPlaceholders(
-                        resId = resId,
-                        quantity = quantity,
-                        placeholdersCount = args.size
-                    )
-                }
-            )
         }
     }
 
     data class Compound(
         val components: List<UIText>
     ) : UIText() {
-
-        constructor(vararg components: UIText) : this(components.toList())
 
         private fun concat(parts: List<CharSequence>): CharSequence {
             if (parts.isEmpty())
@@ -316,8 +229,8 @@ sealed class UIText {
             if (parts.size == 1)
                 return parts[0]
 
-            val styled = parts.any { it is AnnotatedString }
-            return if (styled) {
+            val annotated = parts.any { it is AnnotatedString }
+            return if (annotated) {
                 buildAnnotatedString {
                     parts.forEach {
                         append(it)
